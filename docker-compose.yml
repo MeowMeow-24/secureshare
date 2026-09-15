@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sfs_user
+      POSTGRES_PASSWORD: sfs_password
+      POSTGRES_DB: secure_file_sharing
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sfs_user -d secure_file_sharing"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://sfs_user:sfs_password@db:5432/secure_file_sharing
+      SECRET_KEY: change-me-in-production-use-openssl-rand-hex-32
+      ENCRYPTION_MASTER_KEY: change-me-32-byte-key-for-aes!!
+      CORS_ORIGINS: http://localhost:5173
+    volumes:
+      - ./backend:/app
+      - encrypted_files:/app/storage/encrypted
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+  encrypted_files:

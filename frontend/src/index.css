@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* tailwind v4 ไม่มี dark mode แบบ toggle ด้วย class ให้ในตัว (ปกติ dark: จะยึดตาม
+   prefers-color-scheme ของเครื่องอย่างเดียว) เลยประกาศ custom variant เพิ่มเอง
+   ให้ dark: ทำงานเมื่อมี class="dark" อยู่ที่ <html> แทน จะได้ใช้ปุ่มสลับธีมเองได้ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* โหมดสว่างใช้พื้นหลังสีเทาอ่อน (ไม่ใช่ขาวล้วน) แล้วให้การ์ด/กล่องต่างๆ เป็นสีขาวจริง
+   จะได้เห็นขอบเขตกล่องชัดเจนขึ้น (ปัญหาเดิม: ทุกอย่างเป็นสีขาวเหมือนกันหมด มองแยกยาก) */
+body {
+  @apply bg-slate-100 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* เอฟเฟกต์ของ "Animated List" — รายการค่อยๆ fade + เลื่อนขึ้นเข้ามาทีละอันแบบมีจังหวะ (stagger)
+   ใช้ CSS ธรรมดา ไม่ต้องพึ่ง library แยก เพราะ component ที่ขอมาต้องซื้อ license (React Bits Pro)
+   ใช้คู่กับ inline style animationDelay ที่ตั้งตาม index ของแต่ละ item ตอนเรียกใช้ */
+@keyframes list-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-list-item {
+  animation: list-item-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
