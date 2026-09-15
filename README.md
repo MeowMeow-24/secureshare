@@ -36,6 +36,7 @@ End-to-end encrypted file sharing with RBAC, security monitoring, and anomaly de
 ### With Docker
 
 ```bash
+cp backend/.env.example backend/.env
 docker compose up --build
 ```
 
