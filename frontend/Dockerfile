@@ -1,6 +1,11 @@
 # Build Stage
 FROM node:20-alpine AS build
 WORKDIR /app
+
+# ฝัง URL ของ Backend ตอน Build
+ENV VITE_API_BASE_URL=https://secureshare-production-e9a9.up.railway.app
+ENV VITE_API_URL=https://secureshare-production-e9a9.up.railway.app
+
 COPY package*.json ./
 RUN npm install
 COPY . .
